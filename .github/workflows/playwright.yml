@@ -1,0 +1,48 @@
+name: Playwright
+
+on:
+  pull_request:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: ${{ matrix.app }} tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [saucedemo, todomvc, restful-booker]
+    env:
+      APP: ${{ matrix.app }}
+      SAUCEDEMO_PASSWORD: ${{ secrets.SAUCEDEMO_PASSWORD }}
+      RESTFUL_BOOKER_USERNAME: ${{ secrets.RESTFUL_BOOKER_USERNAME }}
+      RESTFUL_BOOKER_PASSWORD: ${{ secrets.RESTFUL_BOOKER_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run smoke tests on pull requests
+        if: github.event_name == 'pull_request'
+        run: npx playwright test --grep @smoke
+      - name: Run full suite
+        if: github.event_name != 'pull_request'
+        run: npx playwright test
+      - name: Generate Allure report
+        if: always()
+        run: npx allure generate allure-results --clean
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-${{ matrix.app }}-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+            allure-report/
+          retention-days: 14

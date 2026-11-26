@@ -1,0 +1,15 @@
+
+# Playwright
+node_modules/
+.env
+.env.*
+!.env.example
+/test-results/
+/playwright-report/
+/allure-report/
+/allure-results/
+/allure-report-e2e/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/.playwright-mcp/

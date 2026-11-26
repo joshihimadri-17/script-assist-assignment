@@ -1,0 +1,39 @@
+{
+  "name": "playwright-typescript-framework",
+  "version": "1.0.0",
+  "description": "Reusable Playwright and TypeScript test framework foundation",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --project=ui",
+    "test:api": "cross-env APP=restful-booker playwright test --project=api",
+    "test:saucedemo": "cross-env APP=saucedemo playwright test",
+    "test:todomvc": "cross-env APP=todomvc playwright test",
+    "test:booking": "cross-env APP=restful-booker playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression",
+    "allure:generate": "allure generate allure-results --clean",
+    "allure:open": "allure open allure-report",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write \"*.ts\" \"*.json\" \"*.mjs\" \".prettierrc.json\" \"README.md\" \".github/workflows/*.yml\" \"config/**/*.ts\" \"fixtures/**/*.ts\" \"page-objects/**/*.ts\" \"pages/**/*.ts\" \"clients/**/*.ts\" \"schemas/**/*.ts\" \"test-data/**/*.ts\" \"utils/**/*.ts\" \"tests/**/*.ts\" \"docs/**/*.md\" --no-error-on-unmatched-pattern",
+    "format:check": "prettier --check \"*.ts\" \"*.json\" \"*.mjs\" \".prettierrc.json\" \"README.md\" \".github/workflows/*.yml\" \"config/**/*.ts\" \"fixtures/**/*.ts\" \"page-objects/**/*.ts\" \"pages/**/*.ts\" \"clients/**/*.ts\" \"schemas/**/*.ts\" \"test-data/**/*.ts\" \"utils/**/*.ts\" \"tests/**/*.ts\" \"docs/**/*.md\" --no-error-on-unmatched-pattern",
+    "validate": "npm run typecheck && npm run lint && npm run format:check"
+  },
+  "type": "commonjs",
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^22.15.3",
+    "allure": "^3.33.0",
+    "allure-playwright": "^3.15.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.0.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
+    "zod": "^4.6.7"
+  }
+}
