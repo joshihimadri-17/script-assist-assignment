@@ -22,6 +22,29 @@ test('marks a todo complete @regression @todomvc', async ({ page }) => {
   await expect(todoPage.getTodo('Validate API contract')).toHaveClass(/completed/);
 });
 
+test('filters active todos @regression @todomvc', async ({ page }) => {
+  const todoPage = new TodoPage(page);
+  await todoPage.addTodo('Active task');
+  await todoPage.addTodo('Completed task');
+  await todoPage.toggleTodo('Completed task');
+  await todoPage.showActiveTodos();
+
+  await expect(todoPage.items).toHaveCount(1);
+  await expect(todoPage.getTodo('Active task')).toBeVisible();
+});
+
+test('filters completed todos @regression @todomvc', async ({ page }) => {
+  const todoPage = new TodoPage(page);
+  await todoPage.addTodo('Active task');
+  await todoPage.addTodo('Completed task');
+  await todoPage.toggleTodo('Completed task');
+  await todoPage.showCompletedTodos();
+
+  await expect(todoPage.items).toHaveCount(1);
+  await expect(todoPage.getTodo('Completed task')).toBeVisible();
+  await expect(todoPage.getTodo('Completed task')).toHaveClass(/completed/);
+});
+
 test('deletes a todo @regression @todomvc', async ({ page }) => {
   const todoPage = new TodoPage(page);
   await todoPage.addTodo('Remove temporary task');

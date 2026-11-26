@@ -14,7 +14,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [saucedemo, todomvc, restful-booker]
+        include:
+          - app: saucedemo
+            project: ui
+          - app: todomvc
+            project: ui
+          - app: restful-booker
+            project: api
     env:
       APP: ${{ matrix.app }}
       SAUCEDEMO_PASSWORD: ${{ secrets.SAUCEDEMO_PASSWORD }}
@@ -30,10 +36,10 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Run smoke tests on pull requests
         if: github.event_name == 'pull_request'
-        run: npx playwright test --grep @smoke
+        run: npx playwright test --project=${{ matrix.project }} --grep @smoke
       - name: Run full suite
         if: github.event_name != 'pull_request'
-        run: npx playwright test
+        run: npx playwright test --project=${{ matrix.project }}
       - name: Generate Allure report
         if: always()
         run: npx allure generate allure-results --clean
@@ -44,5 +50,6 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            allure-results/
             allure-report/
           retention-days: 14

@@ -3,7 +3,7 @@ import { selectedApp } from './config/apps.config';
 
 const uiProject = {
   name: 'ui',
-  testMatch: [...selectedApp.testMatch],
+  testMatch: selectedApp.kind === 'ui' ? [...selectedApp.testMatch] : [],
   use: {
     ...devices['Desktop Chrome'],
     baseURL: selectedApp.baseUrl,
@@ -13,7 +13,7 @@ const uiProject = {
 
 const apiProject = {
   name: 'api',
-  testMatch: [...selectedApp.testMatch],
+  testMatch: selectedApp.kind === 'api' ? [...selectedApp.testMatch] : [],
   use: {
     baseURL: selectedApp.baseUrl,
   },
@@ -40,5 +40,5 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  projects: [selectedApp.kind === 'ui' ? uiProject : apiProject],
+  projects: [uiProject, apiProject],
 });

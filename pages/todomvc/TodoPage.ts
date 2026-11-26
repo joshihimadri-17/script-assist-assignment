@@ -24,6 +24,14 @@ export class TodoPage {
     await this.getTodo(title).getByRole('checkbox').check();
   }
 
+  async showActiveTodos(): Promise<void> {
+    await this.page.getByRole('link', { name: 'Active', exact: true }).click();
+  }
+
+  async showCompletedTodos(): Promise<void> {
+    await this.page.getByRole('link', { name: 'Completed', exact: true }).click();
+  }
+
   async deleteTodo(title: string): Promise<void> {
     const item = this.getTodo(title);
     await item.hover();

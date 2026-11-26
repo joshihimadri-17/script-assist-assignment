@@ -35,7 +35,7 @@ export const test = base.extend<AuthFixtures>({
     let statePromise = statePromises.get(cacheKey);
 
     if (!statePromise) {
-      statePromise = (async () => {
+      const authenticationPromise = (async () => {
         await mkdir(path.dirname(statePath), { recursive: true });
         const context = await browser.newContext({
           baseURL: environment.urls.saucedemo,
@@ -53,7 +53,13 @@ export const test = base.extend<AuthFixtures>({
           await context.close();
         }
       })();
-      statePromises.set(cacheKey, statePromise);
+      statePromises.set(cacheKey, authenticationPromise);
+      void authenticationPromise.catch(() => {
+        if (statePromises.get(cacheKey) === authenticationPromise) {
+          statePromises.delete(cacheKey);
+        }
+      });
+      statePromise = authenticationPromise;
     }
 
     await use(await statePromise);

@@ -30,13 +30,45 @@ public demo sites and can be overridden with the corresponding `*_BASE_URL` vari
 
 ## Run tests
 
+Run by Playwright project:
+
+```powershell
+npm run test:ui
+npm run test:api
+```
+
+`test:ui` uses the selected `APP` (default: `saucedemo`). `test:api` selects
+`APP=restful-booker`. You can also pair the app and project explicitly:
+
+```powershell
+$env:APP = 'saucedemo'
+npx playwright test --project=ui
+
+$env:APP = 'todomvc'
+npx playwright test --project=ui
+
+$env:APP = 'restful-booker'
+npx playwright test --project=api
+```
+
+Run the app-specific suites:
+
 ```powershell
 npm run test:saucedemo
 npm run test:todomvc
 npm run test:booking
+```
+
+Run smoke or regression tests for the selected `APP`:
+
+```powershell
 npm run test:smoke
 npm run test:regression
 ```
+
+For example, set `$env:APP = 'restful-booker'` before `npm run test:smoke` to
+select the Restful Booker smoke cases. A project/app mismatch collects no tests,
+so selecting the API project cannot accidentally run UI tests.
 
 Playwright writes Allure results to `allure-results`. After running one or more app
 suites, generate and open the combined HTML report:
@@ -46,15 +78,9 @@ npm run allure:generate
 npm run allure:open
 ```
 
-The app can also be selected through the `APP` environment variable:
-
-```powershell
-$env:APP = 'todomvc'
-npx playwright test
-```
-
 Supported values are `saucedemo`, `todomvc`, and `restful-booker`. UI and API tests
-run in separate Playwright projects. Tags include `@smoke` and `@regression`.
+are registered as separate Playwright projects. Tags include `@smoke` and
+`@regression`.
 
 ## Quality checks
 
@@ -86,16 +112,30 @@ ignored by Git.
 
 ## Adding another application
 
-1. Add its typed entry and environment URL in `config/apps.config.ts` and
-   `config/environment.ts`.
-2. Add the corresponding UI or API Playwright project selection and test folder.
-3. Implement app-specific page objects, fixtures, and typed test data where required.
-4. Add focused tests and tags; do not share role state across users.
-5. Add the app to the CI matrix and document any required CI secrets.
-6. Run `npm run validate` and the selected app's test command.
+1. Add the app name to `AppName`, its default URL, validation, and environment URL
+   mapping in `config/environment.ts`.
+2. Add its typed `AppConfiguration` in `config/apps.config.ts`, including `kind`,
+   `testMatch`, tags, roles, and the UI test-id attribute where applicable. Keep its
+   test match scoped to that app's folder.
+3. Add app-specific tests under `tests/ui/<app>/` or `tests/api/` as appropriate.
+   Implement page objects in `pages/`, fixtures, schemas, and typed test data only
+   where the app needs them.
+4. Add a dedicated npm script that sets `APP` and the matching `--project` (UI or
+   API). Verify that the matching project discovers the app's tests and the other
+   project discovers none.
+5. Add an `{ app, project }` entry to the GitHub Actions matrix and document any
+   required repository secrets.
+6. Run `npm run validate`, the app-specific test script, and the repeat-execution
+   check. Record only results that were actually observed.
 
 ## CI
 
-GitHub Actions runs tagged smoke tests on pull requests and the full suite nightly.
+GitHub Actions runs tagged smoke tests on pull requests and the full selected-app
+suite on the nightly schedule (and manual dispatch). Its matrix explicitly pairs
+Sauce Demo and TodoMVC with `ui`, and Restful Booker with `api`. It caches npm
+dependencies and uploads the Playwright HTML report, Allure results/report, and
+`test-results/` artifacts, which include retained traces and failure screenshots.
 Configure `SAUCEDEMO_PASSWORD`, `RESTFUL_BOOKER_USERNAME`, and
-`RESTFUL_BOOKER_PASSWORD` as repository Actions secrets.
+`RESTFUL_BOOKER_PASSWORD` as repository Actions secrets. Secrets are not available
+to workflows from forked pull requests, so credential-dependent cases require an
+appropriate trusted-runner workflow.

@@ -60,12 +60,16 @@ test('rejects an invalid authentication token @regression @restful-booker', asyn
   expect(response.status()).toBe(403);
 });
 
-test('rejects an invalid booking payload @regression @restful-booker', async ({ request }) => {
+test('returns an internal server error for a malformed booking payload @regression @restful-booker', async ({
+  request,
+}) => {
   const response = await request.post('/booking', {
     data: { firstname: 'Incomplete booking' },
   });
 
-  expect([400, 500]).toContain(response.status());
+  expect(response.status()).toBe(500);
+  expect(response.headers()['content-type']).toContain('text/plain');
+  await expect(response.text()).resolves.toBe('Internal Server Error');
 });
 
 test('returns not found for a non-existent booking @regression @restful-booker', async ({
