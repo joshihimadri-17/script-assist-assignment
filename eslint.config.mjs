@@ -9,6 +9,7 @@ export default tseslint.config(
       'test-results/**',
       'playwright-report/**',
       'allure-results/**',
+      'allure-report/**',
       'allure-report-e2e/**',
       '.playwright-mcp/**',
     ],
